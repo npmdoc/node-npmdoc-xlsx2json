@@ -1,0 +1,247 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/daikiueda/xlsx2json">xlsx2json (v1.0.0)</a>
+</h1>
+<h4>Convert xlsx to JSON.</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.xlsx2json">module xlsx2json</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.xlsx2json.xlsx2json">
+            function <span class="apidocSignatureSpan"></span>xlsx2json
+            <span class="apidocSignatureSpan">(pathToXlsx, options, callback)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">xlsx2json.</span>Utils</span>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.xlsx2json.Utils">module xlsx2json.Utils</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.xlsx2json.Utils.Ordinal">
+            function <span class="apidocSignatureSpan">xlsx2json.Utils.</span>Ordinal
+            <span class="apidocSignatureSpan">(ordinalData)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.xlsx2json.Utils.formatRecordByColumnLabel">
+            function <span class="apidocSignatureSpan">xlsx2json.Utils.</span>formatRecordByColumnLabel
+            <span class="apidocSignatureSpan">(recode)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.xlsx2json.Utils.formatRecordByMapping">
+            function <span class="apidocSignatureSpan">xlsx2json.Utils.</span>formatRecordByMapping
+            <span class="apidocSignatureSpan">(recode, mapping)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.xlsx2json" id="apidoc.module.xlsx2json">module xlsx2json</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.xlsx2json.xlsx2json" id="apidoc.element.xlsx2json.xlsx2json">
+        function <span class="apidocSignatureSpan"></span>xlsx2json
+        <span class="apidocSignatureSpan">(pathToXlsx, options, callback)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function xlsx2json(pathToXlsx, options, callback) {
+    return new Promise((resolve, reject) =&gt; {
+        const argTypes = Array.from(arguments).slice(0, 3)
+            .map(value =&gt; typeof value).join(',');
+        let errorMessage;
+
+        switch (argTypes) {
+            case ['string'].join(','):
+            case ['string', 'object'].join(','):
+                callback = () =&gt; {};
+                break;
+
+            case ['string', 'function'].join(','):
+                callback = arguments[1];
+                options = undefined;
+                break;
+
+            case ['string', 'object', 'function'].join(','):
+                break;
+
+            default:
+                errorMessage = 'Any arguments is invalid type';
+                throw new TypeError(errorMessage);
+        }
+
+        convertXlsxToJson(pathToXlsx, options)
+            .then(jsonValueArray =&gt; {
+                callback(null, jsonValueArray);
+                resolve(jsonValueArray);
+            })
+            .catch(error =&gt; {
+                callback(error, null);
+                reject(error);
+            });
+    });
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.xlsx2json.Utils" id="apidoc.module.xlsx2json.Utils">module xlsx2json.Utils</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.xlsx2json.Utils.Ordinal" id="apidoc.element.xlsx2json.Utils.Ordinal">
+        function <span class="apidocSignatureSpan">xlsx2json.Utils.</span>Ordinal
+        <span class="apidocSignatureSpan">(ordinalData)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">class Ordinal {
+<span class="apidocCodeCommentSpan">    /**
+     * @param {Number|String} ordinalData
+     * @returns {Ordinal}
+     */
+</span>    constructor(ordinalData) {
+        if (!ordinalData || !/^([0-9]+|[a-zA-z]+)$/.test(ordinalData) || ordinalData &lt;= 0) {
+            throw new TypeError(ordinalData);
+        }
+
+        /**
+         * @private
+         * @type {Number|String}
+         */
+        this.ordinalData = ordinalData;
+    }
+
+    /** @returns {Number} */
+    toNumber() {return toOrdinalNumber(this.ordinalData);}
+
+    /** @returns {String} */
+    toAlphabet() {return toOrdinalAlphabet(this.ordinalData);}
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.xlsx2json.Utils.formatRecordByColumnLabel" id="apidoc.element.xlsx2json.Utils.formatRecordByColumnLabel">
+        function <span class="apidocSignatureSpan">xlsx2json.Utils.</span>formatRecordByColumnLabel
+        <span class="apidocSignatureSpan">(recode)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function formatRecordByColumnLabel(recode) {
+    const recodeBuffer = {};
+    recode.forEach(function(value, index) {
+        recodeBuffer[new Ordinal(index + 1).toAlphabet()] = value;
+    });
+    return recodeBuffer;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.xlsx2json.Utils.formatRecordByMapping" id="apidoc.element.xlsx2json.Utils.formatRecordByMapping">
+        function <span class="apidocSignatureSpan">xlsx2json.Utils.</span>formatRecordByMapping
+        <span class="apidocSignatureSpan">(recode, mapping)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function formatRecordByMapping(recode, mapping) {
+    return Object.keys(mapping).reduce((formatted, keyName) =&gt; {
+        if (mapping[keyName] !== 0) {
+            formatted[keyName] = recode[new Ordinal(mapping[keyName]).toNumber() - 1];
+        }
+        return formatted;
+    }, {});
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
